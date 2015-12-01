@@ -102,10 +102,12 @@ bool ofxKinectV2::open(string serial){
 void ofxKinectV2::threadedFunction(){
 
     while(isThreadRunning()){
-        protonect.updateKinect(rgbPixelsBack, depthPixelsBack);
+        protonect.updateKinect(rgbPixelsBack, depthPixelsBack, irPixelsBack);
+        
         rgbPixelsFront.swap(rgbPixelsBack);
         depthPixelsFront.swap(depthPixelsBack);
-                
+        irPixelsFront.swap(irPixelsBack);
+        
         lock();
         bNewBuffer = true;
         unlock();
@@ -121,9 +123,10 @@ void ofxKinectV2::update(){
     if( bNewBuffer ){
     
         lock();
-            rgbPix = rgbPixelsFront;
-            rawDepthPixels = depthPixelsFront;
-            bNewBuffer = false;
+        rgbPix = rgbPixelsFront;
+        rawDepthPixels = depthPixelsFront;
+        irPix = irPixelsFront;
+        bNewBuffer = false;
         unlock();
         
         if( rawDepthPixels.size() > 0 ){

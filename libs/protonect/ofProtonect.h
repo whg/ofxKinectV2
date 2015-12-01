@@ -26,7 +26,7 @@ class ofProtonect{
         ofProtonect();
     
         int openKinect(std::string serialNo);
-        void updateKinect(ofPixels & rgbPixels, ofFloatPixels & depthPixels);
+        void updateKinect(ofPixels & rgbPixels, ofFloatPixels & depthPixels, ofFloatPixels &irPixels);
         int closeKinect();
     
         libfreenect2::Freenect2 & getFreenect2Instance(){

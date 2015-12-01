@@ -38,6 +38,7 @@ class ofxKinectV2 : public ofThread{
         ofPixels& getDepthPixels();
         ofPixels& getRgbPixels();
         ofFloatPixels& getRawDepthPixels();
+        ofFloatPixels& getIrPixels() { return irPix; }
     
         ofParameterGroup params;
         ofParameter <float> minDistance;
@@ -50,6 +51,7 @@ class ofxKinectV2 : public ofThread{
         ofPixels depthPix;
         ofFloatPixels rawDepthPixels;
         ofPixels registeredPix;
+        ofFloatPixels irPix;
     
         bool bNewBuffer;
         bool bNewFrame;
@@ -57,9 +59,8 @@ class ofxKinectV2 : public ofThread{
     
         ofProtonect protonect; 
     
-        ofPixels rgbPixelsBack;
-        ofPixels rgbPixelsFront;
-        ofFloatPixels depthPixelsBack;
-        ofFloatPixels depthPixelsFront;
-        int lastFrameNo; 
+        ofPixels rgbPixelsBack, rgbPixelsFront;
+        ofFloatPixels depthPixelsBack, depthPixelsFront;
+        ofFloatPixels irPixelsBack, irPixelsFront;
+        int lastFrameNo;
 };
