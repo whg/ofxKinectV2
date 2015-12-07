@@ -33,6 +33,8 @@
 #include <stdint.h>
 
 #include <libfreenect2/config.h>
+#define LIBFREENECT2_SETCONFIGURATION_COMPAT_INTERNAL
+#include <libfreenect2/libfreenect2.hpp>
 #include <libfreenect2/frame_listener.hpp>
 #include <libfreenect2/packet_processor.h>
 
@@ -40,7 +42,7 @@ namespace libfreenect2
 {
 
 /** Data packet with depth information. */
-struct  DepthPacket
+struct DepthPacket
 {
   uint32_t sequence;
   uint32_t timestamp;
@@ -51,23 +53,13 @@ struct  DepthPacket
 /** Class for processing depth information. */
 typedef PacketProcessor<DepthPacket> BaseDepthPacketProcessor;
 
-class  DepthPacketProcessor : public BaseDepthPacketProcessor
+class DepthPacketProcessor : public ConfigPacketProcessor, public BaseDepthPacketProcessor
 {
 public:
-  /** Configuration of depth processing. */
-  struct  Config
-  {
-    float MinDepth;
-    float MaxDepth;
-
-    bool EnableBilateralFilter; ///< Whether to run the bilateral filter.
-    bool EnableEdgeAwareFilter; ///< Whether to run the edge aware filter.
-
-    Config();
-  };
+  typedef Freenect2Device::Config Config;
 
   /** Parameters of depth processing. */
-  struct  Parameters
+  struct Parameters
   {
     float ab_multiplier;
     float ab_multiplier_per_frq[3];
@@ -125,7 +117,7 @@ protected:
 class OpenGLDepthPacketProcessorImpl;
 
 /** Depth packet processor using OpenGL. */
-class  OpenGLDepthPacketProcessor : public DepthPacketProcessor
+class OpenGLDepthPacketProcessor : public DepthPacketProcessor
 {
 public:
   OpenGLDepthPacketProcessor(void *parent_opengl_context_ptr, bool debug);
@@ -147,7 +139,7 @@ private:
 class CpuDepthPacketProcessorImpl;
 
 /** Depth packet processor using the CPU. */
-class  CpuDepthPacketProcessor : public DepthPacketProcessor
+class CpuDepthPacketProcessor : public DepthPacketProcessor
 {
 public:
   CpuDepthPacketProcessor();
@@ -168,7 +160,7 @@ private:
 class OpenCLDepthPacketProcessorImpl;
 
 /** Depth packet processor using OpenCL. */
-class  OpenCLDepthPacketProcessor : public DepthPacketProcessor
+class OpenCLDepthPacketProcessor : public DepthPacketProcessor
 {
 public:
   OpenCLDepthPacketProcessor(const int deviceId = -1);

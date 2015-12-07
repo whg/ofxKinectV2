@@ -38,11 +38,18 @@ class ofxKinectV2 : public ofThread{
         ofPixels& getDepthPixels();
         ofPixels& getRgbPixels();
         ofFloatPixels& getRawDepthPixels();
-        ofFloatPixels& getIrPixels() { return irPix; }
-    
+        ofFloatPixels& getIrPixels() { return irPixels; }
+        ofPixels& getIrImagePixels() { return irImagePixels; }
+        ofPixels& getRegisteredPixels() { return registeredPix; }
+
         ofParameterGroup params;
         ofParameter <float> minDistance;
         ofParameter <float> maxDistance;
+
+        ofVec3f mapDepthPointToWorldPoint(ofVec2f p) {
+            ofFloatColor c = rawDepthPixels.getColor(p.x, p.y);
+            return ofVec3f(c.r, c.g, c.b);
+        }
 
     protected:
         void threadedFunction();
@@ -51,8 +58,9 @@ class ofxKinectV2 : public ofThread{
         ofPixels depthPix;
         ofFloatPixels rawDepthPixels;
         ofPixels registeredPix;
-        ofFloatPixels irPix;
-    
+        ofFloatPixels irPixels;
+        ofPixels irImagePixels;
+        
         bool bNewBuffer;
         bool bNewFrame;
         bool bOpened;
@@ -60,6 +68,7 @@ class ofxKinectV2 : public ofThread{
         ofProtonect protonect; 
     
         ofPixels rgbPixelsBack, rgbPixelsFront;
+        ofPixels registeredPixelsBack, registeredPixelsFront;
         ofFloatPixels depthPixelsBack, depthPixelsFront;
         ofFloatPixels irPixelsBack, irPixelsFront;
         int lastFrameNo;

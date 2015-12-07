@@ -87,7 +87,7 @@ int ofProtonect::openKinect(string serial){
     return 0;
 }
 
-void ofProtonect::updateKinect(ofPixels & rgbPixels, ofFloatPixels & depthPixels, ofFloatPixels &irPixels ){
+void ofProtonect::updateKinect(ofPixels & rgbPixels, ofFloatPixels & depthPixels, ofFloatPixels &irPixels, ofPixels &registeredPixels){
   
     if(bOpened){
         listener->waitForNewFrame(frames);
@@ -95,10 +95,13 @@ void ofProtonect::updateKinect(ofPixels & rgbPixels, ofFloatPixels & depthPixels
         libfreenect2::Frame *ir = frames[libfreenect2::Frame::Ir];
         libfreenect2::Frame *depth = frames[libfreenect2::Frame::Depth];
         
+        registration->apply(rgb, depth, undistorted, registered);
+
         rgbPixels.setFromPixels(rgb->data, rgb->width, rgb->height, 3);
         depthPixels.setFromPixels((float *)depth->data, ir->width, ir->height, 1);
         irPixels.setFromPixels((float*) ir->data, ir->width, ir->height, 1);
-        
+        registeredPixels.setFromPixels(registered->data, registered->width, registered->height, 4);
+
         listener->release(frames);
     }
 }

@@ -4,7 +4,8 @@
 
 
 #include "ofMain.h"
-
+#define LIBFREENECT2_API 
+#define LIBFREENECT2_DEPRECATED 
 #include <libfreenect2/libfreenect2.hpp>
 #include <libfreenect2/frame_listener_impl.h>
 #include <libfreenect2/registration.h>
@@ -26,7 +27,7 @@ class ofProtonect{
         ofProtonect();
     
         int openKinect(std::string serialNo);
-        void updateKinect(ofPixels & rgbPixels, ofFloatPixels & depthPixels, ofFloatPixels &irPixels);
+        void updateKinect(ofPixels & rgbPixels, ofFloatPixels & depthPixels, ofFloatPixels &irPixels, ofPixels &registeredPixels);
         int closeKinect();
     
         libfreenect2::Freenect2 & getFreenect2Instance(){

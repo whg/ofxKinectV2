@@ -102,12 +102,13 @@ bool ofxKinectV2::open(string serial){
 void ofxKinectV2::threadedFunction(){
 
     while(isThreadRunning()){
-        protonect.updateKinect(rgbPixelsBack, depthPixelsBack, irPixelsBack);
+        protonect.updateKinect(rgbPixelsBack, depthPixelsBack, irPixelsBack, registeredPixelsBack);
         
         rgbPixelsFront.swap(rgbPixelsBack);
         depthPixelsFront.swap(depthPixelsBack);
         irPixelsFront.swap(irPixelsBack);
-        
+        registeredPixelsFront.swap(registeredPixelsBack);
+
         lock();
         bNewBuffer = true;
         unlock();
@@ -125,7 +126,9 @@ void ofxKinectV2::update(){
         lock();
         rgbPix = rgbPixelsFront;
         rawDepthPixels = depthPixelsFront;
-        irPix = irPixelsFront;
+        irPixels = irPixelsFront;
+        registeredPix = registeredPixelsFront;
+        registeredPix.setImageType(OF_IMAGE_COLOR);
         bNewBuffer = false;
         unlock();
         
@@ -145,7 +148,18 @@ void ofxKinectV2::update(){
             }
 
         }
-        
+
+        if (irPixels.size() > 0) {
+            if (irImagePixels.getWidth() != irPixels.getWidth()) {
+                irImagePixels.allocate(irPixels.getWidth(), irPixels.getHeight(), 1);
+            }
+            float *irPix = irPixels.getData();
+            unsigned char *irImagePix = irImagePixels.getData();
+            for (int i = 0; i < irPixels.size(); i++) {
+                irImagePix[i] = irPix[i] * 0.00389099121; // = 255 / 65536.0f;
+            }
+        }
+
         
         bNewFrame = true; 
     }
