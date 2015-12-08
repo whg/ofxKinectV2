@@ -13,6 +13,8 @@ ofxKinectV2::ofxKinectV2(){
     bNewFrame  = false;
     bNewBuffer = false;
     bOpened    = false;
+    depthPixDirty = false;
+    irImagePixelsDirty = false;
     lastFrameNo = -1;
     
     //set default distance range to 50cm - 600cm
@@ -103,13 +105,13 @@ void ofxKinectV2::threadedFunction(){
 
     while(isThreadRunning()){
         protonect.updateKinect(rgbPixelsBack, depthPixelsBack, irPixelsBack, registeredPixelsBack);
-        
+        lock();
+
         rgbPixelsFront.swap(rgbPixelsBack);
         depthPixelsFront.swap(depthPixelsBack);
         irPixelsFront.swap(irPixelsBack);
         registeredPixelsFront.swap(registeredPixelsBack);
 
-        lock();
         bNewBuffer = true;
         unlock();
     }
@@ -128,38 +130,11 @@ void ofxKinectV2::update(){
         rawDepthPixels = depthPixelsFront;
         irPixels = irPixelsFront;
         registeredPix = registeredPixelsFront;
-        registeredPix.setImageType(OF_IMAGE_COLOR);
+        //registeredPix.setImageType(OF_IMAGE_COLOR);
         bNewBuffer = false;
+        depthPixDirty = true;
+        irImagePixelsDirty = true;
         unlock();
-        
-        if( rawDepthPixels.size() > 0 ){
-            if( depthPix.getWidth() != rawDepthPixels.getWidth() ){
-                depthPix.allocate(rawDepthPixels.getWidth(), rawDepthPixels.getHeight(), 1);
-            }
-        
-            float * pixelsF         = rawDepthPixels.getData();
-            unsigned char * pixels  = depthPix.getData();
-                
-            for(int i = 0; i < depthPix.size(); i++){
-                pixels[i] = ofMap(rawDepthPixels[i], minDistance, maxDistance, 255, 0, true);
-                if( pixels[i] == 255 ){
-                    pixels[i] = 0;
-                }
-            }
-
-        }
-
-        if (irPixels.size() > 0) {
-            if (irImagePixels.getWidth() != irPixels.getWidth()) {
-                irImagePixels.allocate(irPixels.getWidth(), irPixels.getHeight(), 1);
-            }
-            float *irPix = irPixels.getData();
-            unsigned char *irImagePix = irImagePixels.getData();
-            for (int i = 0; i < irPixels.size(); i++) {
-                irImagePix[i] = irPix[i] * 0.00389099121; // = 255 / 65536.0f;
-            }
-        }
-
         
         bNewFrame = true; 
     }
@@ -172,6 +147,27 @@ bool ofxKinectV2::isFrameNew(){
 
 //--------------------------------------------------------------------------------
 ofPixels& ofxKinectV2::getDepthPixels(){
+
+    if (depthPixDirty) {
+        if (rawDepthPixels.size() > 0) {
+            if (depthPix.getWidth() != rawDepthPixels.getWidth()) {
+                depthPix.allocate(rawDepthPixels.getWidth(), rawDepthPixels.getHeight(), 1);
+            }
+
+            float * pixelsF = rawDepthPixels.getData();
+            unsigned char * pixels = depthPix.getData();
+
+            for (int i = 0; i < depthPix.size(); i++) {
+                pixels[i] = ofMap(rawDepthPixels[i], minDistance, maxDistance, 255, 0, true);
+                if (pixels[i] == 255) {
+                    pixels[i] = 0;
+                }
+            }
+
+        }
+        depthPixDirty = false;
+    }
+
     return depthPix;
 }
 
@@ -183,6 +179,25 @@ ofFloatPixels& ofxKinectV2::getRawDepthPixels(){
 //--------------------------------------------------------------------------------
 ofPixels& ofxKinectV2::getRgbPixels(){
     return rgbPix; 
+}
+
+ofPixels& ofxKinectV2::getIrImagePixels() {
+
+    if (irImagePixelsDirty) {
+        if (irPixels.size() > 0) {
+            if (irImagePixels.getWidth() != irPixels.getWidth()) {
+                irImagePixels.allocate(irPixels.getWidth(), irPixels.getHeight(), 1);
+            }
+            float *irPix = irPixels.getData();
+            unsigned char *irImagePix = irImagePixels.getData();
+            for (int i = 0; i < irPixels.size(); i++) {
+                irImagePix[i] = irPix[i] * 0.00389099121; // = 255 / 65536.0f;
+            }
+        }
+        irImagePixelsDirty = false;
+    }
+
+    return irImagePixels; 
 }
 
 //--------------------------------------------------------------------------------
