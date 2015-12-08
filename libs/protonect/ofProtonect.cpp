@@ -102,8 +102,16 @@ void ofProtonect::updateKinect(ofPixels & rgbPixels, ofFloatPixels & depthPixels
         irPixels.setFromPixels((float*) ir->data, ir->width, ir->height, 1);
         registeredPixels.setFromPixels(registered->data, registered->width, registered->height, 4);
 
+        
+
         listener->release(frames);
     }
+}
+
+ofVec3f ofProtonect::getWorldCoord(ofVec2f imagePos) {
+    float x, y, z, c;
+    registration->getPointXYZRGB(undistorted, registered, int(imagePos.y), int(imagePos.x), x, y, z, c);
+    return ofVec3f(x, y, z);
 }
 
 int ofProtonect::closeKinect(){

@@ -47,8 +47,9 @@ class ofxKinectV2 : public ofThread{
         ofParameter <float> maxDistance;
 
         ofVec3f mapDepthPointToWorldPoint(ofVec2f p) {
-            ofFloatColor c = rawDepthPixels.getColor(p.x, p.y);
-            return ofVec3f(c.r, c.g, c.b);
+            //ofFloatColor c = rawDepthPixels.getColor(p.x, p.y);
+            //return ofVec3f(p.x, p.y, c.r);
+            return protonect.getWorldCoord(p);
         }
 
     protected:

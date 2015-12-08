@@ -28,6 +28,8 @@ class ofProtonect{
     
         int openKinect(std::string serialNo);
         void updateKinect(ofPixels & rgbPixels, ofFloatPixels & depthPixels, ofFloatPixels &irPixels, ofPixels &registeredPixels);
+        ofVec3f getWorldCoord(ofVec2f imagePos);
+
         int closeKinect();
     
         libfreenect2::Freenect2 & getFreenect2Instance(){
