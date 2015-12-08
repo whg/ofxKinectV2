@@ -39,17 +39,23 @@ class ofxKinectV2 : public ofThread{
         ofPixels& getRgbPixels();
         ofFloatPixels& getRawDepthPixels();
         ofFloatPixels& getIrPixels() { return irPixels; }
-        ofPixels& getIrImagePixels() { return irImagePixels; }
+        ofPixels& getIrImagePixels();
         ofPixels& getRegisteredPixels() { return registeredPix; }
 
         ofParameterGroup params;
         ofParameter <float> minDistance;
         ofParameter <float> maxDistance;
-
+        
+        // TODO: remove this!
         ofVec3f mapDepthPointToWorldPoint(ofVec2f p) {
-            //ofFloatColor c = rawDepthPixels.getColor(p.x, p.y);
-            //return ofVec3f(p.x, p.y, c.r);
             return protonect.getWorldCoord(p);
+        }
+
+        ofVec3f imageToWorld(ofVec2f p) {
+            lock();
+            ofVec3f o = protonect.getWorldCoord(p);
+            unlock();
+            return o;
         }
 
     protected:
@@ -73,4 +79,6 @@ class ofxKinectV2 : public ofThread{
         ofFloatPixels depthPixelsBack, depthPixelsFront;
         ofFloatPixels irPixelsBack, irPixelsFront;
         int lastFrameNo;
+
+        bool depthPixDirty, irImagePixelsDirty;
 };
